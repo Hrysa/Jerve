@@ -1,0 +1,14 @@
+{
+    "name": "jerve/jerve",
+    "description": "web framework.",
+    "type": "web",
+    "license": "BSD",
+    "authors": [
+        {
+            "name": "Val Hsu",
+            "email": "val1208@163.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
