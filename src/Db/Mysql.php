@@ -51,7 +51,7 @@ class Mysql extends Db
 	}
 
 	public function
-	execute($sql, $params = "")
+	execute($sql, $params = NULL)
 	{
 		if(!$this->connect)
 			$this->set_connect();

@@ -4,29 +4,53 @@ namespace Jerve;
 
 class Controller
 {
-	protected $db;
+	protected $Db;
 
-	protected $urlParams;
+	protected $root_path;
+
+	protected $app_path;
+
+	protected $Router;
+
+	protected $View;
+
+	protected $Cache;
+
 
 	public function
 	__construct()
 	{
-		$this->db = $GLOBALS['_JERVE_C']['db'];
-		$this->view = new View();
-		$this->router = $GLOBALS['_JERVE_C']['router'];
+		$this->_register();
+	}
 
+	public function
+	_register()
+	{
+		$_J = &$GLOBALS['_J'];
+		$this->root_path = $_J['root_path'];
+		$this->app_path = $_J['app_path'];
+		$this->Router = $_J['Router'];
+		$this->Db = $_J['Db'];
+		$this->View = new View();
 	}
 
 	public function
 	render($tpl = "")
 	{
-		$this->view->render($tpl);
+		$this->View->render($tpl);
 	}
 
 	public function
 	assign($name, $value)
 	{
 		if($name && ($value !== false))
-			$this->view->assign($name, $value);
+			$this->View->assign($name, $value);
+	}
+
+	public function
+	Cache($expire_time = 5)
+	{
+		if(!is_object($this->Cache))
+			$this->Cache = new Cache($this->View, $expire_time);
 	}
 }
