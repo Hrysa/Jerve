@@ -10,5 +10,13 @@
         }
     ],
     "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+		"Jerve\\","src"}
+    },
+	"autoload-dev": {
+        "psr-4": {
+		"Jerve\\","src"}
+	},
     "require": {}
 }
