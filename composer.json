@@ -1,7 +1,7 @@
 {
     "name": "jerve/jerve",
     "description": "web framework.",
-    "type": "web",
+    "type": "project",
     "license": "BSD",
     "authors": [
         {
