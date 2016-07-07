@@ -17,7 +17,8 @@ class AutoLoad
 	auto_load($class)
 	{
 		$path = explode("\\", $class);
-		$file = $this->path . DIRECTORY_SEPARATOR . $path[0] . DIRECTORY_SEPARATOR . "Controller" . DIRECTORY_SEPARATOR . $path[1] . ".php";
+		$path = implode(DIRECTORY_SEPARATOR, $path);
+		$file = $this->path . DIRECTORY_SEPARATOR . $path . ".php";
 		if(file_exists($file))
 			require_once($file);
 	}

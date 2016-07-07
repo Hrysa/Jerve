@@ -82,8 +82,7 @@ class Router
 		if(count($part) >= 2) {
 			$this->controller = $part[0];
 			$this->action = $action = $part[1];
-			$Controller = $this->app_path . '\\' . $this->controller;
-
+			$Controller = $this->app_path . '\\Controller\\' . $this->controller;
 			try{
 				if(class_exists($Controller)) {
 					$ct = new $Controller();
