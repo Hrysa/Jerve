@@ -41,10 +41,11 @@ class View
 					}
 				}
 				
-				//ob_start();
+				ob_start();
 				require_once($file_path);
 				$data =  ob_get_contents();
 				ob_end_clean();
+				//$data = $this->res_merge($data);
 				echo $data;
 
 				if(is_object($this->Cache))
@@ -69,6 +70,32 @@ class View
 		} else
 			return false;
 		return $file_path;
+	}
+
+	public function
+	res_merge($data)
+	{
+		// css
+		$pattern = "/<link[\b-~][^>]+href=.([\b-~][^>]+css)[^>]+>/";
+		$data = $this->preg_merge($pattern, $data, 'style');
+
+		// js
+		$pattern = "/<script[\b-~][^>]+src=.([\b-~][^>]+js)[^>]+>/";
+		$data = $this->preg_merge($pattern, $data, 'script');
+
+		return $data;
+	}
+
+	public function
+	preg_merge($pattern, $data, $label)
+	{
+		if(preg_match_all($pattern, $data, $matchs)) {
+			foreach($matchs[1] as $k => $each) {
+				$res = "<$label>" . file_get_contents($_SERVER['DOCUMENT_ROOT'] . $each) . "</$label>";
+				$data = str_replace($matchs[0][$k], $res, $data);
+			}
+		}
+		return $data;
 	}
 
 	public function

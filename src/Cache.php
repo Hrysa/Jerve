@@ -32,7 +32,7 @@ class Cache
 		$this->View = $View;
 
 		$this->uri_md5 = md5($_SERVER['QUERY_STRING']);
-		$this->period = intval(time() / 5);
+		$this->period = intval(time() / $expire_time);
 
 		$filename = $this->uri_md5 . $this->period;
 		$expired_filename = $this->uri_md5 . ($this->period-1);
@@ -48,10 +48,9 @@ class Cache
 		$this->expired_file_path = $this->cache_path . DIRECTORY_SEPARATOR . $expired_filename;
 
 		if(file_exists($this->file_path)) {
-			require_once($this->file_path);
+			echo file_get_contents($this->file_path);
 			exit;
-		}
-		else {
+		} else {
 			$this->View->cache($this);
 		}
 	}

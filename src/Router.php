@@ -40,7 +40,6 @@ class Router
 		} else {
 			$this->path = "index";
 		}
-
 	}
 
 	public function
