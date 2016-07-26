@@ -17,4 +17,10 @@ class Model
 	{
 		return $this->Db->execute($sql, $params);
 	}
+
+	public function
+	unique($data)
+	{
+		return $data[0];
+	}
 }

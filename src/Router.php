@@ -18,6 +18,8 @@ class Router
 
 	private $path;
 
+	private $path_alias;
+
 	private $get;
 
 	private $app_path;
@@ -52,7 +54,7 @@ class Router
 	set($index, $value = "")
 	{
 		if(is_array($index)) {
-			foreach($set as $each)
+			foreach($index as $each)
 			{
 				$this->index[$each[0]] = $each[1];
 			}
@@ -65,18 +67,7 @@ class Router
 	dispatch()
 	{
 		$this->parse_alias();
-
-		if(is_callable($this->path)) {
-			$path = $this->path;
-			$result = $path();
-
-			if(is_string($result)) {
-				$this->path = $result;
-				$this->parse_alias();
-			} else
-			return $result;
-		}
-
+		$this->parse_params();
 		$part = explode('/', $this->path);
 
 		if(count($part) >= 2) {
@@ -111,11 +102,15 @@ class Router
 	parse_alias()
 	{
 		$index = $this->index;
-
 		if(count($index)) {
 			foreach($index as $k => $each) {
-				if( (strpos($this->path, $k) === 0))
-					$this->path = $each;
+				if( (strpos($this->path, (string)$k) === 0)) {
+					$this->path_alias = $k;
+					if(is_callable($each))
+						$this->path = $each();
+					else
+						$this->path = $each;
+				}
 			}
 		}
 	}
@@ -146,47 +141,42 @@ class Router
 	}
 
 	public function
-	get_params()
+	get_params($k = false)
 	{
-		return $this->params;
+		if($k !== false)
+			return isset($this->params[$k]) ? $this->params[$k] : false;
+		else
+			return $this->params;
 	}
 
 	private function
 	parse_params()
 	{
-		if(is_callable(name))
-		// alias router
-		if(count($this->index)) {
-			$index = $this->index;
-			foreach($index as $k => $each) {
-				if( (strpos($this->path, $k) === 0)) {
-					$params = substr(str_replace($k, '', $this->path), 1);
-				}
+		if($this->path_alias)
+			$path = $this->path_alias;
+		else
+			$path = $this->path;
+		$params = explode('/', str_replace($this->path_alias, "", $this->get['s']));
+		unset($params[0]);
+		array_values($params);
+		$get = $this->get;
+		unset($get['s']);
+		$this->params = @array_merge($params, $get);
+	}
+
+	public function
+	redirect($action, $params = "")
+	{
+		if($params) {
+			foreach($params as $k => &$each) {
+				$each = $k . "=" . $each;
 			}
-		}
-		// direct router
-		if(!isset($params)) {
-			$path = explode("/", $this->path);
-			unset($path[0]);
-			unset($path[1]);
-			$params = implode("/",$path);
+			$params = implode("&", $params);
+			$params = "?" . $params;
 		}
 
-		if(isset($params)) {
-			$params = explode("/", $params);
-			$tmp = [];
-			for($i = 0; $i < count($params); $i+=2)
-			{
-				if($params[$i])
-					$tmp[$params[$i]] = isset($params[$i+1]) ? $params[$i+1] : 0;
-			}
-			$params2 = explode("&", $this->uri);
-			unset($params2[0]);
-			foreach($params2 as $each) {
-				$v = explode("=", $each);
-				$tmp[$v[0]] = $v[1];
-			}
-			$this->params = $tmp;
-		}
+		$uri = $action .$params;
+		$url = 'http://' . $_SERVER['SERVER_NAME'] . '/' .$uri;
+		header("Location: $url");
 	}
 }

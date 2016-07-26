@@ -62,7 +62,7 @@ class Mysql extends Db
 				$result = json_decode(json_encode($handle->fetchAll(PDO::FETCH_OBJ)), 1);
 				if($this->enable_log())
 					$this->set_log($sql, $params, $result);
-				return  count($result) == 1 ?  $result[0] : $result;
+				return $result;
 			}
 		}
 		return false;

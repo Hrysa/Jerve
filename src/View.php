@@ -42,7 +42,7 @@ class View
 				}
 				
 				ob_start();
-				require_once($file_path);
+				@require_once($file_path);
 				$data =  ob_get_contents();
 				ob_end_clean();
 				//$data = $this->res_merge($data);

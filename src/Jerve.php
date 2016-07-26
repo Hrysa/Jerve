@@ -54,6 +54,9 @@ class Jerve
 	{
 		if(!$i)
 			return $this->Router;
-		$this->Router->set($i, $v);
+		if(is_array($i))
+			$this->Router->set($i);
+		else
+			$this->Router->set($i, $v);
 	}
 }

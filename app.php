@@ -17,10 +17,10 @@ $router->set([
  * set database.
  */
 $db = new Jerve\Db\Mysql([
-		"db" => "renrenyou",
-		"server" => "115.159.210.63:3306",
-		"user" => "root",
-		"password" => "shjjjr",
+		"db" => "dbname",
+		"server" => "dbserver",
+		"user" => "username",
+		"password" => "password",
 		"long_connect" => "true",
 		"log" => true
 	]);
