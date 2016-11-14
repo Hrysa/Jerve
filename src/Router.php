@@ -79,8 +79,9 @@ class Router
 					$ct = new $Controller();
 					if($_POST)
 					{
-						if(method_exists($ct, 'POST_'.$action))
-							$ct->'POST_'.$action();
+						$post_action = 'POST_'.$action;
+						if(method_exists($ct, $post_action))
+							$ct->$post_action();
 						else(method_exists($ct, $action)
 							$ct->$action();
 					}
