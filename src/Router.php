@@ -82,7 +82,7 @@ class Router
 						$post_action = 'POST_'.$action;
 						if(method_exists($ct, $post_action))
 							$ct->$post_action();
-						else if(method_exists($ct, $action)
+						else if(method_exists($ct, $action))
 							$ct->$action();
 					}
 					else if(method_exists($ct, $action))
