@@ -77,8 +77,14 @@ class Router
 			try{
 				if(class_exists($Controller)) {
 					$ct = new $Controller();
-					
-					if(method_exists($ct, $action))
+					if($_POST)
+					{
+						if(method_exists($ct, 'POST_'.$action))
+							$ct->'POST_'.$action();
+						else(method_exists($ct, $action)
+							$ct->$action();
+					}
+					else if(method_exists($ct, $action))
 						$ct->$action();
 					else
 						throw new Exception("Action doesn't exists. $Action", 1);
