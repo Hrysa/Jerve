@@ -1,6 +1,2 @@
 # Jerve
-=====================
-## This is a tiny web framework
-------------------
-
-
+ This is a tiny web framework
