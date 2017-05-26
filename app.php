@@ -28,11 +28,15 @@ $db = new Jerve\Db\Mysql([
 /*
  * init Jerve.
  */
+/*
 $jerve = new Jerve\Jerve([
 		"app_dir" => "App",
 		"view_dir" => "App/View",
 		"router" => $router,
 		"db" => $db
 	]);
+*/
 
+$jerve = new Jerve\Jerve(dirname(__FILE__));
+$jerve->router('index', 'Index/index');
 $jerve->run();
