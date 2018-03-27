@@ -11,21 +11,15 @@ class Jerve
 {
 	private $Router;
 
-	private $conf;
-	
 	private $root_path;
 	
 	private $app_path;
-
-	private $Db;
-
-	public function __construct($root_path, $app_path = "App")
+	
+	public function __construct($root_path, $app_path = "Apps")
 	{
-		global $_J;
-		$_J['root_path'] = $this->root_path = $root_path;
-		$_J['app_path'] = $this->app_path = $app_path;
-		$_J['Router'] = $this->Router = new Router();
-		$_J['Db'] = "";
+        $this->app_path = $app_path;
+        $this->root_path = $root_path;
+		$this->Router = new Router($this);
 	}
 
 	public function
@@ -59,4 +53,16 @@ class Jerve
 		else
 			$this->Router->set($i, $v);
 	}
+
+	public function get_root_path() {
+	    return $this->root_path;
+    }
+
+    public function get_app_path() {
+	    return $this->app_path;
+    }
+
+    public function get_router() {
+	    return $this->Router;
+    }
 }

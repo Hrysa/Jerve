@@ -19,13 +19,14 @@ class View
 	private $Cache;
 
 	public function
-	__construct()
+	__construct($app)
 	{
-		$_J = &$GLOBALS['_J'];
-		$this->root_path = $_J['root_path'];
-		$this->app_path = $_J['app_path'];
-		$this->controller = $_J['Router']->get_controller();
-		$this->action = $_J['Router']->get_action();
+        $this->app = $app;
+        $this->root_path = $app->get_root_path();
+        $this->app_path = $app->get_app_path();
+        $this->controller = $app->get_router()->get_controller();
+        $this->action = $app->get_router()->get_action();
+
 	}
 
 	public function
@@ -64,11 +65,12 @@ class View
 	{
 		$tpl = explode("/", $tpl);
 		if(count($tpl) == 1)
-			$file_path = $this->root_path . DIRECTORY_SEPARATOR . $this->app_path . DIRECTORY_SEPARATOR . "View" . DIRECTORY_SEPARATOR . $this->controller . DIRECTORY_SEPARATOR . $this->action . ".html";
+			$file_path = $this->root_path . DIRECTORY_SEPARATOR . $this->app_path . DIRECTORY_SEPARATOR . "View" . DIRECTORY_SEPARATOR . $this->controller . DIRECTORY_SEPARATOR . $tpl[0] . ".html";
 		else if(count($tpl) > 1) {
 			$file_path = $this->root_path . DIRECTORY_SEPARATOR . $this->app_path . DIRECTORY_SEPARATOR . "View" . DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $tpl) . ".html";
 		} else
-			return false;
+            $file_path = $this->root_path . DIRECTORY_SEPARATOR . $this->app_path . DIRECTORY_SEPARATOR . "View" . DIRECTORY_SEPARATOR . $this->controller . DIRECTORY_SEPARATOR . $this->action . ".html";
+
 		return $file_path;
 	}
 

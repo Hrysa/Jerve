@@ -2,17 +2,26 @@
 
 namespace Jerve\Db;
 
-class Db
+class DbInterface
 {
-    protected $conf;
+    //protected $conf;
     public $log;
 
 
-    public function
+    protected function
     __construct()
     {
 
     }
+
+//    public function
+//    get_instance()
+//    {
+//        if(!self::$instace)
+//            self::$instance = new DbInterface();
+//
+//        return self::$instance;
+//    }
 
     public function
     enable_log()
@@ -33,5 +42,11 @@ class Db
     log()
     {
         return $this->log;
+    }
+
+    static function
+    echo()
+    {
+
     }
 }

@@ -2,49 +2,78 @@
 
 namespace Jerve\Db;
 use PDO;
+use Exception;
 
-class Mysql extends Db
+class Mysql extends DbInterface
 {
-	private $db;
+    static public $instance;
 
-	private $server;
+	static private $db;
 
-	private $password;
+	static private $server;
 
-	private $user;
+    static private $password;
 
-	private $connect;
+    static private $user;
 
-	private $long_connect;
+    static private $long_connect;
+
+    static private $conf;
+
+    // mysql connection.
+    private $connect;
+
+    // prepared handle.
+    private $handle;
+
+    private $result;
 
 	public function
-	__construct($conf)
+	__construct($conf = '')
 	{
 		parent::__construct();
-		$this->set_conf($conf);
+		//$this->set_conf($conf);
 	}
+
+	static function get_instance() {
+	    if(!self::$conf)
+	        throw new Exception('config does not exists.');
+
+        if(!self::$instance)
+            self::$instance = new self();
+        return self::$instance;
+    }
 
 	private function
 	set_connect()
 	{
-		$this->connect = new PDO("mysql:host=$this->server;dbname=$this->db","$this->user","$this->password", array(
+	    $server = self::$server;
+	    $db = self::$db;
+	    $password = self::$password;
+	    $user = self::$user;
+        $long_connect = self::$long_connect;
+
+		$this->connect = new PDO("mysql:host=$server;dbname=$db","$user","$password", array(
     		PDO::ATTR_PERSISTENT => $this->long_connect,
     		PDO::ATTR_EMULATE_PREPARES => false,
     		PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'
 		));
+
+		if(!$this->connect)
+		    throw new Exception("mysql driver: set_connect() ");
 		$this->log['connect_time'] = date("Y-m-d H:i:s");
 	}
 
-	private function
+	static public function
 	set_conf($conf)
 	{
 		if( isset($conf['db']) && isset($conf['server']) && isset($conf['password']) && isset($conf['user']) ) {
-			$this->db = $conf['db'];
-			$this->server = $conf['server'];
-			$this->password = $conf['password'];
-			$this->user = $conf['user'];
-			$this->long_connect = isset($conf['long_connect']) ? $conf['long_connect'] : true;
-			$this->conf = $conf;
+			self::$db = $conf['db'];
+            self::$server = $conf['server'];
+            self::$password = $conf['password'];
+            self::$user = $conf['user'];
+            self::$long_connect = isset($conf['long_connect']) ? $conf['long_connect'] : true;
+            self::$conf = $conf;
 			return true;
 		} else
 			return false;
@@ -56,16 +85,48 @@ class Mysql extends Db
 		if(!$this->connect)
 			$this->set_connect();
 
-		$handle = $this->connect->prepare($sql);
-		if($handle) {
-			if($handle->execute($params)) {
-				$result = json_decode(json_encode($handle->fetchAll(PDO::FETCH_OBJ)), 1);
-				if($this->enable_log())
-					$this->set_log($sql, $params, $result);
-				return $result;
-			}
-		}
-		return false;
+		$this->handle = $this->connect->prepare($sql);
+		$this->query();
+		return $this;
 	}
+
+	public function
+    query()
+    {
+        $handle = $this->handle;
+        if($handle) {
+            if($handle->execute($params)) {
+                $result = json_decode(json_encode($handle->fetchAll(PDO::FETCH_OBJ)), 1);
+                if($this->enable_log())
+                    $this->set_log($sql, $params, $result);
+                 $this->result = $result;
+            }
+        }
+        return $this;
+    }
+
+	public function
+    one($fields = '')
+    {
+        if($fields) {
+
+            $fields = explode(',', $fields);
+            $result = [];
+            if (count($fields) > 1) {
+                foreach ($fields as $each)
+                    $result[$each] = $this->result[$each];
+            } else
+                $result = current($this->result)[$fields[0]];
+
+        } else
+            $result = current($this->result);
+        return $result;
+    }
+
+    public function
+    all()
+    {
+        return $this->result;
+    }
 
 }

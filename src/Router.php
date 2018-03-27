@@ -5,7 +5,9 @@ use Exception;
 use Jerve\View;
 
 class Router
-{	
+{
+    private $app;
+
 	private $uri;
 
 	private $index;
@@ -27,11 +29,12 @@ class Router
 	private $View;
 
 	public function
-	__construct()
+	__construct($app)
 	{
-		$_J = &$GLOBALS['_J'];
-		$this->root_path = $_J['root_path'];
-		$this->app_path = $_J['app_path'];
+	    $this->app = $app;
+
+		$this->root_path = $app->get_root_path();
+		$this->app_path = $app->get_app_path();
 
 		$this->uri = $_SERVER['QUERY_STRING'];
 		if(count($_GET)) {
@@ -73,35 +76,39 @@ class Router
 		if(count($part) >= 2) {
 			$this->controller = $part[0];
 			$this->action = $action = $part[1];
-			$Controller = $this->app_path . '\\Controller\\' . $this->controller;
-			try{
+			$Controller = $this->app_path . '\\Controller\\' . $this->controller . '\\' . $this->action;
+
 				if(class_exists($Controller)) {
 					$ct = new $Controller();
-					if($_POST)
-					{
-						$post_action = 'POST_'.$action;
-						if(method_exists($ct, $post_action))
-							$ct->$post_action();
-						else if(method_exists($ct, $action))
-							$ct->$action();
-					}
-					else if(method_exists($ct, $action))
-						$ct->$action();
+					$ct->register($this->app);
+					//echo $_SERVER['REQUEST_METHOD'];
+					//print_r($_SERVER);
+                    $prefix = strtolower($_SERVER['REQUEST_METHOD']);
+
+                    //header('Access-Control-Allow-Methods:PUT,POST,GET,DELETE,OPTIONS');
+
+                    $restAction = $prefix;
+                    if(method_exists($ct, $restAction)) {
+                        $apiFormat = $ct->apiFormat;
+                        if($apiFormat == 'xml') {
+                            header("Content-type: application/xml");
+                            // TODO
+                            echo xmlrpc_encode($ct->$restAction());
+                        } else
+                            echo json_encode($ct->$restAction());
+
+                    }
+                    else if(method_exists($ct, $action))
+                        $ct->$action();
+
 					else
-						throw new Exception("Action doesn't exists. $Action", 1);
+						throw new Exception("Action doesn't exists: $action", 1);
 				} else {
-					throw new Exception("Controller doesn't exists. $Controller");
+					throw new Exception("Controller doesn't exists: $Controller");
 				}
-			} catch (Exception $e) {
-				echo $e->getMessage();
-			}
+
 		} else {
-			try{
 				throw new Exception("Wrong URL.", 1);
-			} catch (Exception $e){
-				echo $e->getMessage();
-			}
-			
 		}
 	}
 
@@ -117,7 +124,7 @@ class Router
 						$this->path = $each();
 					else
 						$this->path = $each;
-				}
+                }
 			}
 		}
 	}
@@ -159,16 +166,29 @@ class Router
 	private function
 	parse_params()
 	{
-		if($this->path_alias)
+        $uri = $this->get['s'];
+        $uri = explode('?', $uri);
+
+
+        if($this->path_alias)
 			$path = $this->path_alias;
 		else
 			$path = $this->path;
-		$params = explode('/', str_replace($this->path_alias, "", $this->get['s']));
-		unset($params[0]);
-		array_values($params);
-		$get = $this->get;
-		unset($get['s']);
-		$this->params = @array_merge($params, $get);
+		$params = explode('?', str_replace($this->path_alias, "", $this->get['s']));
+
+
+        $params[0] = explode('/', $params[0]);
+        $params[1] = explode('=', $params[1]);
+
+        for($i = 1; $i < count($params[0]); $i+=2 ) {
+            $this->get[$params[0][$i]] = $params[0][$i+1];
+        }
+
+        for($i = 0; $i < count($params[1]); $i+=2) {
+            $this->get[$params[1][$i]] = $params[1][$i+1];
+        }
+        unset($this->get['s']);
+		$this->params = $this->get;
 	}
 
 	public function
@@ -186,4 +206,20 @@ class Router
 		$url = 'http://' . $_SERVER['SERVER_NAME'] . '/' .$uri;
 		header("Location: $url");
 	}
+
+	public function
+    get($key = '')
+    {
+        if($key)
+            return $this->params[$key];
+        return $this->params;
+    }
+
+    public function
+    post($key = '')
+    {
+        if($key)
+            return $_POST[$key];
+        return $_POST;
+    }
 }

@@ -6,6 +6,8 @@ class Controller
 {
 	protected $Db;
 
+	protected $app;
+
 	protected $root_path;
 
 	protected $app_path;
@@ -16,28 +18,31 @@ class Controller
 
 	protected $Cache;
 
+	public $apiFormat = 'json';
 
 	public function
 	__construct()
 	{
-		$this->_register();
+
 	}
 
 	public function
-	_register()
-	{
-		$_J = &$GLOBALS['_J'];
-		$this->root_path = $_J['root_path'];
-		$this->app_path = $_J['app_path'];
-		$this->Router = $_J['Router'];
-		$this->Db = $_J['Db'];
-		$this->View = new View();
-	}
+    register($app)
+    {
+        $this->app = $app;
+        $this->root_path = $app->get_root_path();
+        $this->app_path = $app->get_app_path();
+        $this->Router = $app->get_router();
+
+    }
 
 	public function
 	render($tpl = "")
 	{
-		$this->View->render($tpl);
+        if(!$this->View)
+            $this->View = new View($this->app);
+
+        $this->View->render($tpl);
 	}
 
 	public function
