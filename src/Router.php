@@ -43,7 +43,7 @@ class Router
 				$this->get['s'] = substr($this->get['s'], 1);
 			$this->path = explode('?',$this->get['s'])[0];
 		} else {
-			$this->path = "index";
+			$this->path = "Index";
 		}
 	}
 
