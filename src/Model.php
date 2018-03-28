@@ -1,16 +1,26 @@
 <?php
 namespace Jerve;
 
+use Jerve\Db\Mysql;
+
 class Model
 {
-	private $Db;
+	protected $Db;
+	static public $instance;
 
 	public function
 	__construct()
 	{
-		$_J = &$GLOBALS['_J'];
-		$this->Db = $_J['Db'];
+        $this->Db = Mysql::get_instance();
 	}
+
+	static public function
+    instance()
+    {
+        if(!self::$instance)
+            self::$instance = new self();
+        return self::$instance;
+    }
 
 	public function
 	execute($sql, $params = NULL)

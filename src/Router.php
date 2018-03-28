@@ -41,7 +41,7 @@ class Router
 			$this->get = $_GET;
 			if(strpos($this->get['s'], "/") === 0)
 				$this->get['s'] = substr($this->get['s'], 1);
-			$this->path = $this->get['s'];
+			$this->path = explode('?',$this->get['s'])[0];
 		} else {
 			$this->path = "index";
 		}
@@ -73,44 +73,63 @@ class Router
 		$this->parse_params();
 		$part = explode('/', $this->path);
 
-		if(count($part) >= 2) {
-			$this->controller = $part[0];
-			$this->action = $action = $part[1];
-			$Controller = $this->app_path . '\\Controller\\' . $this->controller . '\\' . $this->action;
+        $app_name = $part[0] ? $part[0] : 'Index';
+        $this->controller = $part[1] ? $part[1] : 'Index';
+        $this->action = $action = $part[2] ? $part[2] : 'index';
 
-				if(class_exists($Controller)) {
-					$ct = new $Controller();
-					$ct->register($this->app);
-					//echo $_SERVER['REQUEST_METHOD'];
-					//print_r($_SERVER);
-                    $prefix = strtolower($_SERVER['REQUEST_METHOD']);
+        $Controller = $this->app_path . '\\Controller\\' . $app_name . '\\' . $this->controller;
 
-                    //header('Access-Control-Allow-Methods:PUT,POST,GET,DELETE,OPTIONS');
+        if(class_exists($Controller)) {
+            $ct = new $Controller();
+            $ct->register($this->app);
 
-                    $restAction = $prefix;
-                    if(method_exists($ct, $restAction)) {
-                        $apiFormat = $ct->apiFormat;
-                        if($apiFormat == 'xml') {
-                            header("Content-type: application/xml");
-                            // TODO
-                            echo xmlrpc_encode($ct->$restAction());
-                        } else
-                            echo json_encode($ct->$restAction());
+            $prefix = strtolower($_SERVER['REQUEST_METHOD']);
+            $restAction = $prefix;
+            if(method_exists($ct, $restAction) && $this->action == 'index') {
+                $apiFormat = $ct->apiFormat;
+                if($apiFormat == 'xml') {
+                    header("Content-type: application/xml");
+                    // TODO
+                    $res = $this->excute($ct, $restAction);
+                    if($res)
+                        echo xmlrpc_encode($res);
+                } else {
+                    $res = $this->excute($ct, $restAction);
+                    if ($res)
+                        echo json_encode($res);
+                }
+            }
+            else if(method_exists($ct, $action)) {
+                $res = $this->excute($ct, $action);
+            }
+            else
+                throw new Exception("Action doesn't exists: $action", 1);
+        } else {
+            throw new Exception("Controller doesn't exists: $Controller");
+        }
 
-                    }
-                    else if(method_exists($ct, $action))
-                        $ct->$action();
-
-					else
-						throw new Exception("Action doesn't exists: $action", 1);
-				} else {
-					throw new Exception("Controller doesn't exists: $Controller");
-				}
-
-		} else {
-				throw new Exception("Wrong URL.", 1);
-		}
 	}
+
+	public function
+    excute($ct, $action)
+    {
+        $method = new \ReflectionMethod($ct, $action);
+        $params = $method->getParameters();
+        $get = $this->get();
+        $post = $this->post();
+        $data = [];
+        foreach($params as $each) {
+            $tmp = '';
+            if(isset($get[$each->name]))
+                $tmp = $get[$each->name];
+
+            if(isset($post[$each->name]))
+                $tmp = $post[$each->name];
+
+            $data[] = $tmp;
+        }
+        return $ct->$action(...$data);
+    }
 
 	private function
 	parse_alias()
@@ -118,7 +137,7 @@ class Router
 		$index = $this->index;
 		if(count($index)) {
 			foreach($index as $k => $each) {
-				if( (strpos($this->path, (string)$k) === 0)) {
+				if( (strpos($this->path, (string)$k.'/') === 0) || (strpos($this->path, (string)$k.'?') === 0)) {
 					$this->path_alias = $k;
 					if(is_callable($each))
 						$this->path = $each();
@@ -169,25 +188,12 @@ class Router
         $uri = $this->get['s'];
         $uri = explode('?', $uri);
 
+        $params[1] = explode('=', $uri[1]);
 
-        if($this->path_alias)
-			$path = $this->path_alias;
-		else
-			$path = $this->path;
-		$params = explode('?', str_replace($this->path_alias, "", $this->get['s']));
-
-
-        $params[0] = explode('/', $params[0]);
-        $params[1] = explode('=', $params[1]);
-
-        for($i = 1; $i < count($params[0]); $i+=2 ) {
-            $this->get[$params[0][$i]] = $params[0][$i+1];
-        }
-
-        for($i = 0; $i < count($params[1]); $i+=2) {
-            $this->get[$params[1][$i]] = $params[1][$i+1];
-        }
+        if($params[1][0])
+            $this->get[$params[1][0]] = $params[1][1] ? $params[1][1] : '';
         unset($this->get['s']);
+
 		$this->params = $this->get;
 	}
 

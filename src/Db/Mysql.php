@@ -86,12 +86,12 @@ class Mysql extends DbInterface
 			$this->set_connect();
 
 		$this->handle = $this->connect->prepare($sql);
-		$this->query();
+		$this->query($params);
 		return $this;
 	}
 
 	public function
-    query()
+    query($params = '')
     {
         $handle = $this->handle;
         if($handle) {
@@ -118,7 +118,7 @@ class Mysql extends DbInterface
             } else
                 $result = current($this->result)[$fields[0]];
 
-        } else
+        } else if($this->result)
             $result = current($this->result);
         return $result;
     }
@@ -128,5 +128,5 @@ class Mysql extends DbInterface
     {
         return $this->result;
     }
-
+    
 }
