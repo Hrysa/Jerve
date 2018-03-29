@@ -110,6 +110,7 @@ class Mysql extends DbInterface
 	public function
     one($fields = '')
     {
+        var_dump($this->result);
         if($fields) {
 
             $fields = explode(',', $fields);
@@ -120,13 +121,10 @@ class Mysql extends DbInterface
             } else
                 $result = current($this->result)[$fields[0]];
 
-        } else if($this->result && is_array($this->result))
+        } else if(is_array($this->result))
             $result = current($this->result);
         else {
-            if($this->result && is_array($this->result))
-                $result = current($this->result);
-            else
-                $result = $this->result;
+            $result = $this->result;
         }
         return $result;
     }
