@@ -94,6 +94,8 @@ class Mysql extends DbInterface
     query($params = '')
     {
         $handle = $this->handle;
+        // clean up query result.
+        $this->result = NULL;
         if($handle) {
             if($handle->execute($params)) {
                 $result = json_decode(json_encode($handle->fetchAll(PDO::FETCH_OBJ)), 1);
@@ -118,8 +120,10 @@ class Mysql extends DbInterface
             } else
                 $result = current($this->result)[$fields[0]];
 
-        } else if($this->result)
+        } else if($this->result && is_array($this->result))
             $result = current($this->result);
+        else
+            $result = $this->result;
         return $result;
     }
 
