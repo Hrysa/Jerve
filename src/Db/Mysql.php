@@ -122,8 +122,12 @@ class Mysql extends DbInterface
 
         } else if($this->result && is_array($this->result))
             $result = current($this->result);
-        else
-            $result = $this->result;
+        else {
+            if($this->result && is_array($this->result))
+                $result = current($this->result);
+            else
+                $result = $this->result;
+        }
         return $result;
     }
 
