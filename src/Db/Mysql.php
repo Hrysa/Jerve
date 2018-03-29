@@ -110,7 +110,6 @@ class Mysql extends DbInterface
 	public function
     one($fields = '')
     {
-        var_dump($this->result);
         if($fields) {
 
             $fields = explode(',', $fields);
