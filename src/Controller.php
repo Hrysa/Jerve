@@ -23,7 +23,8 @@ class Controller
 	public function
 	__construct()
 	{
-	    session_id($_SERVER['HTTP_MKSESSION']);
+	    if($_SERVER['HTTP_MKSESSION'] && !empty($_SERVER['HTTP_MKSESSION']))
+	        session_id($_SERVER['HTTP_MKSESSION']);
         session_start();
 	}
 
