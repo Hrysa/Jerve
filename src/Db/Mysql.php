@@ -91,13 +91,19 @@ class Mysql extends DbInterface
 	}
 
 	public function
+    getlastInsertId()
+    {
+        return $this->connect->lastInsertId();
+    }
+
+	public function
     query($params = '')
     {
         $handle = $this->handle;
         // clean up query result.
         $this->result = NULL;
         if($handle) {
-            if($handle->execute($params)) {
+            if($r = $handle->execute($params)) {
                 $result = json_decode(json_encode($handle->fetchAll(PDO::FETCH_OBJ)), 1);
                 if($this->enable_log())
                     $this->set_log($sql, $params, $result);
@@ -123,9 +129,8 @@ class Mysql extends DbInterface
         } else if(is_array($this->result)) {
             $result = $this->result[0];
         }
-        else {
+        else
             $result = $this->result;
-        }
 
         return $result;
     }
