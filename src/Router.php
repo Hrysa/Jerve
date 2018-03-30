@@ -119,7 +119,7 @@ class Router
         $post = $this->post();
         $data = [];
         foreach($params as $each) {
-            $tmp = '';
+            $tmp = NULL;
             if(isset($get[$each->name]))
                 $tmp = $get[$each->name];
 
