@@ -104,8 +104,6 @@ class Mysql
         if($handle) {
             if($r = $handle->execute($params)) {
                 $result = json_decode(json_encode($handle->fetchAll(PDO::FETCH_OBJ)), 1);
-                if($this->enable_log())
-                    $this->set_log($sql, $params, $result);
                  $this->result = $result;
             }
         }
