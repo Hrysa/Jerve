@@ -2,9 +2,9 @@
 
 namespace Jerve\Db;
 
-class DbInterface
+class Factory
 {
-    //protected $conf;
+
     public $log;
 
 
@@ -14,14 +14,14 @@ class DbInterface
 
     }
 
-//    public function
-//    get_instance()
-//    {
-//        if(!self::$instace)
-//            self::$instance = new DbInterface();
-//
-//        return self::$instance;
-//    }
+    public function
+    get_instance($db_driver = 'Mysql')
+    {
+        if(!self::$instace)
+            self::$instance = new DbInterface();
+
+        return self::$instance;
+    }
 
     public function
     enable_log()
