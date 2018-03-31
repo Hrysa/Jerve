@@ -31,8 +31,7 @@ class Mysql
 	public function
 	__construct($conf = '')
 	{
-		parent::__construct();
-		//$this->set_conf($conf);
+		//parent::__construct();
 	}
 
 	static function get_instance() {
