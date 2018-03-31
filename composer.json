@@ -2,7 +2,7 @@
     "name": "jerve/jerve",
     "description": "web framework.",
     "type": "project",
-    "license": "BSD",
+    "license": "MIT",
     "authors": [
         {
             "name": "Val Hsu",
