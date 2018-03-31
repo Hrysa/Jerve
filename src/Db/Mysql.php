@@ -4,7 +4,7 @@ namespace Jerve\Db;
 use PDO;
 use Exception;
 
-class Mysql extends DbInterface
+class Mysql
 {
     static public $instance;
 
