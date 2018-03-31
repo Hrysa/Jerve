@@ -128,6 +128,8 @@ class Router
 
             $data[] = $tmp;
         }
+        if(isset($params[0]) && $params[0]->name == "params")
+            return $ct->$action(array_merge($get,$post));
         return $ct->$action(...$data);
     }
 
