@@ -1,29 +1,8 @@
 <?php
 
-require_once("bootstrap.php");
+use Jerve\Db\Mysql;
+require_once("vendor/autoload.php");
 
-/*
- * set router.
- */
-$router = new Jerve\Router();
-$router->set([
-		['index','Index/index'],
-		['home', 'Index/index'],
-		['app', 'App/app'],
-		['view', 'App/app']
-	]);
-
-/*
- * set database.
- */
-$db = new Jerve\Db\Mysql([
-		"db" => "dbname",
-		"server" => "dbserver",
-		"user" => "username",
-		"password" => "password",
-		"long_connect" => "true",
-		"log" => true
-	]);
 
 /*
  * init Jerve.
@@ -37,6 +16,18 @@ $jerve = new Jerve\Jerve([
 	]);
 */
 
-$jerve = new Jerve\Jerve(dirname(__FILE__));
-$jerve->router('index', 'Index/index');
-$jerve->run();
+Mysql::set_conf([
+    "db" => "",
+    "server" => "",
+    "user" => "",
+    "password" => "",
+    "long_connect" => false,
+    "log" => true
+]);
+try {
+    $jerve = new Jerve\Jerve(dirname(__FILE__), 'Apps');
+    $jerve->router('home', 'Index/Index');
+    $jerve->run();
+} catch (\Exception $e) {
+    echo $e->getMessage();
+}
